@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29728.190
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BotListasTelepeaje", "BotListasTelepeaje\BotListasTelepeaje.csproj", "{DE4E87E0-0C84-4AE4-9973-020136106444}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BotonPrueba", "BotonPrueba\BotonPrueba.csproj", "{DA3FE23A-C57F-4DD6-989C-027670C38E59}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DE4E87E0-0C84-4AE4-9973-020136106444}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE4E87E0-0C84-4AE4-9973-020136106444}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE4E87E0-0C84-4AE4-9973-020136106444}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE4E87E0-0C84-4AE4-9973-020136106444}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA3FE23A-C57F-4DD6-989C-027670C38E59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA3FE23A-C57F-4DD6-989C-027670C38E59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA3FE23A-C57F-4DD6-989C-027670C38E59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA3FE23A-C57F-4DD6-989C-027670C38E59}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2DEB110D-0245-44F9-B61B-39F7A7E3EEE3}
+	EndGlobalSection
+EndGlobal
