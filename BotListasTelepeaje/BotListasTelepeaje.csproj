@@ -50,6 +50,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\ListaDTO.cs" />
+    <Compile Include="Models\ListaServidorDTO.cs" />
+    <Compile Include="Models\ListasObjectDTO.cs" />
+    <Compile Include="Models\WebServiceDTO.cs" />
     <Compile Include="Service1.cs">
       <SubType>Component</SubType>
     </Compile>
