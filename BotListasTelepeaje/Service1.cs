@@ -31,7 +31,7 @@ namespace BotListasTelepeaje
         protected override void OnStart(string[] args)
         {
             timer = new System.Timers.Timer();
-            timer.Interval = 300000;
+            timer.Interval = 600000;
             timer.Elapsed += Timer_Elapsed;
             timer.Enabled = true;
             timer.Start();
@@ -40,43 +40,38 @@ namespace BotListasTelepeaje
         {
 
             timer = new System.Timers.Timer();
-            timer.Interval = 1000;
+            timer.Interval = 600000;
             timer.Elapsed += Timer_Elapsed;
             timer.Enabled = true;
             timer.Start();
         }
-        private async void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
+            try
+            {
+
+            
             timer.Enabled = false;
             timer.Stop();
-            using (var client = new HttpClient())
+            using (WebClient wc = new WebClient())
             {
-                var ReceiveLastLista = await client.GetAsync(new Uri("http://pc004.sytes.net:182/HistorialPlaza/Irapuato"));
-
-                if (ReceiveLastLista.IsSuccessStatusCode)
-                {
-                    //ListasObject listasObject;
-                    var contenido = await ReceiveLastLista.Content.ReadAsStringAsync();
-                    contenido.ToString();
-                    MyProperty = JsonConvert.DeserializeObject<List<ListasObjectDTO>>(contenido);
-
-                    ChecarWebServices();
-                    ChecarListasServidor();
-                    ChecarListas();
-                    //return null;
-                }
-                else
-                {
-                    //return null;
-                    //algo fallo
-                }
+                var json = wc.DownloadString("http://pc004.sytes.net:182/HistorialPlaza/Irapuato");
+                MyProperty = JsonConvert.DeserializeObject<List<ListasObjectDTO>>(json);
+            }
+            ChecarWebServices();
+            ChecarListasServidor();
+            ChecarListasSQL();
+            timer.Enabled = true;
+            timer.Start();
+            }
+            catch (Exception Ex)
+            {
+                Bot.SendTextMessageAsync(-364639169, "Oh oh, algo salió mal con el bot que monitorea los servicios, que ironía :( : " + Ex.StackTrace);
+                timer.Enabled = true;
+                timer.Start();
+     
             }
         }
-        //private async Task<ListaDTO> DoWork(object state)
-        //{
-
-
-        //}
         private void ChecarWebServices()
         {
 
@@ -94,82 +89,69 @@ namespace BotListasTelepeaje
                     //validar que el web service este actualizado
                     if (Convert.ToDateTime(dto.webService.date) < DateTime.Now.AddMinutes(-20))
                     {
-                        Bot.SendTextMessageAsync(-431912689, "No se han enviado cruces desde *" + dto.webService.date + "*", Telegram.Bot.Types.Enums.ParseMode.Markdown);
+                        Bot.SendTextMessageAsync(-431912689, "Atrasado el envio de cruces de la plaza: *" + dto.caseta + "* ultimo registro enviado: *" + dto.webService.date + "*", Telegram.Bot.Types.Enums.ParseMode.Markdown);
+
+                        //Bot.SendTextMessageAsync(-431912689, "No se han enviado cruces desde *" + dto.webService.date + "*", Telegram.Bot.Types.Enums.ParseMode.Markdown);
                         //webService.date = dto.webService.date;
-                    }
-                    else
-                    {
-                        Bot.SendTextMessageAsync(-431912689, "Atrasado el envio de cruces de la plaza: *" + dto.caseta + "*Con fecha: *" + dto.webService.date + "*", Telegram.Bot.Types.Enums.ParseMode.Markdown);
-                    }
+                    }                    
                 }
             }
-            //throw new NotImplementedException();
         }
         private void ChecarListasServidor()
         {
-
-            throw new NotImplementedException();
+            foreach (var dto in MyProperty)
+            {           
+                //Meto las propiedades del dto recorrido en el usuario
+                if (dto.listaServidor == null)
+                {
+                    //Mando un nullo por que no hay conexion
+                    //Bot.SendTextMessageAsync(-431912689, "No hay conexion en la plaza *" + dto.caseta + "*", Telegram.Bot.Types.Enums.ParseMode.Markdown);
+                }
+                else
+                {
+                    //validar que el web service este actualizado
+                    if (Convert.ToDateTime(dto.listaServidor.creationTime) < DateTime.Now.AddMinutes(-35))
+                    {
+                        Bot.SendTextMessageAsync(-431912689, "Atrasado las listas en el servidor: *" + dto.caseta + "* ultima lista creada a las: *" + dto.listaServidor.creationTime + "*", Telegram.Bot.Types.Enums.ParseMode.Markdown);
+                    }
+                }
+            }
         }
 
 
 
-        public async void ChecarListas()
+        public  void ChecarListasSQL()
         {
 
-            using (var client = new HttpClient())
+            foreach (var dto in MyProperty)
             {
-                var ReceiveLastLista = await client.GetAsync(new Uri("http://pc004.sytes.net:182/HistorialPlaza/Irapuato"));
-
-                if (ReceiveLastLista.IsSuccessStatusCode)
+                //Meto las propiedades del dto recorrido en el usuario
+                if (dto.lista == null)
                 {
-                    //ListasObject listasObject;
-                    var contenido = await ReceiveLastLista.Content.ReadAsStringAsync();
-                    contenido.ToString();
-                    var objResponse1 = JsonConvert.DeserializeObject<List<ListasObjectDTO>>(contenido);
-                    foreach (var dto in objResponse1)
+                    //Mando un nullo por que no hay conexion
+                    //Bot.SendTextMessageAsync(-431912689, "No hay conexion en la plaza *" + dto.caseta + "*", Telegram.Bot.Types.Enums.ParseMode.Markdown);
+                }
+                else
+                {
+                    //validar que el web service este actualizado
+                    if (Convert.ToDateTime(dto.lista.creationTime) < DateTime.Now.AddMinutes(-35))
                     {
-
-                        //listas
-                        if (dto.lista == null)
+                        if (dto.caseta.ToString() != "Tepotzotlan")
                         {
-                            //Mando un nullo por que no hay conexion
-                            //await Bot.SendTextMessageAsync(-431912689, "No hay conexion en la plaza *" + dto.caseta + "*", Telegram.Bot.Types.Enums.ParseMode.Markdown);
+                            Bot.SendTextMessageAsync(-431912689, "No se estan generando nuevas listas en la plaza: *" + dto.caseta + "* ultima lista creada fue a las: *" + dto.lista.creationTime + "*", Telegram.Bot.Types.Enums.ParseMode.Markdown);
 
-                        }
-                        else
-                        {
-                            if (Convert.ToDateTime(dto.lista.creationTime) < DateTime.Now.AddMinutes(-40))
-                            {
-                                {
-                                    await Bot.SendTextMessageAsync(-431912689, "Cruces de la plaza: *" + dto.caseta + "*Con fecha: *" + dto.lista.creationTime + "*", Telegram.Bot.Types.Enums.ParseMode.Markdown);
-
-                                }
-                            }
-                            if (dto.listaServidor == null)
-                            {
-                                //Mando un nullo por que no hay conexion
-                                //await Bot.SendTextMessageAsync(-431912689, "No hay conexion en la plaza *" + dto.caseta + "*", Telegram.Bot.Types.Enums.ParseMode.Markdown);
-
-                            }
-                            else
-                            {
-                                if (Convert.ToDateTime(dto.lista.creationTime) < DateTime.Now.AddMinutes(-40))
-                                {
-                                    await Bot.SendTextMessageAsync(-431912689, "Cruces de la plaza: *" + dto.caseta + "*Con fecha: *" + dto.listaServidor.creationTime + "*", Telegram.Bot.Types.Enums.ParseMode.Markdown);
-
-
-                                }
-                            }
                         }
                     }
                 }
             }
+
+
         }
 
         protected override void OnStop()
         {
             //WriteToFile("WriteToFileHostedService: Process Stopped");
-
+            File.WriteAllText(@"C:\temporal\LSTABINTBotStopped.txt", "Se detuvo");
         }
     }
 }
