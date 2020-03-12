@@ -22,7 +22,7 @@ namespace BotonPrueba
 
         private void Iniciar_Click(object sender, EventArgs e)
         {
-            BotListasTelepeaje.Service1 service = new BotListasTelepeaje.Service1();
+            BotListasTelepeaje.BotTelepeaje service = new BotListasTelepeaje.BotTelepeaje();
             service.Inicio();
             Iniciar.Enabled = false;
         }

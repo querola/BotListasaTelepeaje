@@ -1,6 +1,6 @@
 ﻿namespace BotListasTelepeaje
 {
-    partial class Service1
+    partial class BotTelepeaje
     {
         /// <summary> 
         /// Variable del diseñador necesaria.
@@ -28,8 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
-            this.ServiceName = "Service1";
+            // 
+            // BotTelepeaje
+            // 
+            this.ServiceName = "BotTelepeaje";
+
         }
 
         #endregion

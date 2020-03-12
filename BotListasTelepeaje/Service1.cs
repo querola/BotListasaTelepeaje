@@ -18,12 +18,12 @@ using BotListasTelepeaje.Models;
 
 namespace BotListasTelepeaje
 {
-    public partial class Service1 : ServiceBase
+    public partial class BotTelepeaje : ServiceBase
     {
         private System.Timers.Timer timer = null;
         public List<ListasObjectDTO> MyProperty { get; set; }
         private static readonly TelegramBotClient Bot = new TelegramBotClient("1135151562:AAGZemcnKdHL6uCSmN6Tiu9Zfs-SZ4VNHcg");
-        public Service1()
+        public BotTelepeaje()
         {
             InitializeComponent();
         }
@@ -40,7 +40,7 @@ namespace BotListasTelepeaje
         {
 
             timer = new System.Timers.Timer();
-            timer.Interval = 600000;
+            timer.Interval = 60000;
             timer.Elapsed += Timer_Elapsed;
             timer.Enabled = true;
             timer.Start();
@@ -49,27 +49,34 @@ namespace BotListasTelepeaje
         {
             try
             {
-
-            
-            timer.Enabled = false;
-            timer.Stop();
-            using (WebClient wc = new WebClient())
-            {
-                var json = wc.DownloadString("http://pc004.sytes.net:182/HistorialPlaza/Irapuato");
-                MyProperty = JsonConvert.DeserializeObject<List<ListasObjectDTO>>(json);
-            }
-            ChecarWebServices();
-            ChecarListasServidor();
-            ChecarListasSQL();
-            timer.Enabled = true;
-            timer.Start();
+                timer.Enabled = false;
+                timer.Stop();
+                using (WebClient wc = new WebClient())
+                {
+                    var json = wc.DownloadString("http://pc004.sytes.net:182/HistorialPlaza/Irapuato");
+                    MyProperty = JsonConvert.DeserializeObject<List<ListasObjectDTO>>(json);
+                }
+                ChecarWebServices();
+                ChecarListasServidor();
+                ChecarListasSQL();
+                timer.Enabled = true;
+                timer.Start();
             }
             catch (Exception Ex)
             {
+                string logFile = @"C:\Temporal\BotTelepeajeLog.txt";
+                if (System.IO.File.Exists(logFile))
+                {
+                    string[] lines = System.IO.File.ReadAllLines(logFile);
+                    lines[0] = $"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")} {Ex}\n{lines[0]}";
+                    System.IO.File.Delete(logFile);
+                    System.IO.File.WriteAllLines(logFile, lines);
+                }
+                else System.IO.File.WriteAllText(logFile, $"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}. {Ex}");
                 Bot.SendTextMessageAsync(-364639169, "Oh oh, algo salió mal con el bot que monitorea los servicios, que ironía :( : " + Ex.StackTrace);
                 timer.Enabled = true;
                 timer.Start();
-     
+
             }
         }
         private void ChecarWebServices()
@@ -93,14 +100,14 @@ namespace BotListasTelepeaje
 
                         //Bot.SendTextMessageAsync(-431912689, "No se han enviado cruces desde *" + dto.webService.date + "*", Telegram.Bot.Types.Enums.ParseMode.Markdown);
                         //webService.date = dto.webService.date;
-                    }                    
+                    }
                 }
             }
         }
         private void ChecarListasServidor()
         {
             foreach (var dto in MyProperty)
-            {           
+            {
                 //Meto las propiedades del dto recorrido en el usuario
                 if (dto.listaServidor == null)
                 {
@@ -120,7 +127,7 @@ namespace BotListasTelepeaje
 
 
 
-        public  void ChecarListasSQL()
+        public void ChecarListasSQL()
         {
 
             foreach (var dto in MyProperty)
@@ -150,8 +157,16 @@ namespace BotListasTelepeaje
 
         protected override void OnStop()
         {
-            //WriteToFile("WriteToFileHostedService: Process Stopped");
-            File.WriteAllText(@"C:\temporal\LSTABINTBotStopped.txt", "Se detuvo");
+            string logFile = @"C:\Temporal\BotTelepeajeLog.txt";
+            if (File.Exists(logFile))
+            {
+                string[] lines = System.IO.File.ReadAllLines(logFile);
+                lines[0] = $"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")} {" Se detuvo el servicio del bot"}";
+                System.IO.File.Delete(logFile);
+                System.IO.File.WriteAllLines(logFile, lines);
+            }
+            else
+                File.WriteAllText(@"C:\Temporal\BotTelepeajeLog.txt", "Detuvieron el bot de listas : " + $"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}");
         }
     }
 }
